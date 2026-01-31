@@ -74,7 +74,19 @@
   
   function init() {
     particles = [];
-    const numberOfParticles = Math.min(Math.floor((canvas.width * canvas.height) / 15000), 100);
+    
+    // Detect mobile devices and reduce particle count
+    const isMobile = window.innerWidth <= 768;
+    const isSmallMobile = window.innerWidth <= 480;
+    
+    let maxParticles = 100;
+    if (isSmallMobile) {
+      maxParticles = 20; // Very few particles on small screens
+    } else if (isMobile) {
+      maxParticles = 40; // Reduced particles on mobile
+    }
+    
+    const numberOfParticles = Math.min(Math.floor((canvas.width * canvas.height) / 15000), maxParticles);
     
     for (let i = 0; i < numberOfParticles; i++) {
       particles.push(new Particle());
@@ -82,6 +94,10 @@
   }
   
   function connectParticles() {
+    // Skip connections on small mobile devices for performance
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile && particles.length > 30) return;
+    
     for (let i = 0; i < particles.length; i++) {
       for (let j = i + 1; j < particles.length; j++) {
         const dx = particles[i].x - particles[j].x;

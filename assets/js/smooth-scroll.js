@@ -139,27 +139,32 @@ document.addEventListener('DOMContentLoaded', function() {
   
   const cards = document.querySelectorAll('.card');
   
-  cards.forEach(card => {
-    let isDragging = false;
-    let startX, startY;
-    let translateX = 0, translateY = 0;
-    let currentX = 0, currentY = 0;
-    
-    card.addEventListener('mousedown', function(e) {
-      // Don't drag if clicking on a link
-      if (e.target.tagName === 'A' || e.target.closest('a')) {
-        return;
-      }
+  // Only enable dragging on desktop devices
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const isMobile = window.innerWidth <= 768;
+  
+  if (!isTouchDevice && !isMobile) {
+    cards.forEach(card => {
+      let isDragging = false;
+      let startX, startY;
+      let translateX = 0, translateY = 0;
+      let currentX = 0, currentY = 0;
       
-      isDragging = true;
-      card.classList.add('dragging');
-      
-      startX = e.clientX - currentX;
-      startY = e.clientY - currentY;
-      
-      card.style.transition = 'none';
-      card.style.zIndex = '1000';
-    });
+      card.addEventListener('mousedown', function(e) {
+        // Don't drag if clicking on a link
+        if (e.target.tagName === 'A' || e.target.closest('a')) {
+          return;
+        }
+        
+        isDragging = true;
+        card.classList.add('dragging');
+        
+        startX = e.clientX - currentX;
+        startY = e.clientY - currentY;
+        
+        card.style.transition = 'none';
+        card.style.zIndex = '1000';
+      });
     
     document.addEventListener('mousemove', function(e) {
       if (!isDragging) return;
@@ -186,76 +191,38 @@ document.addEventListener('DOMContentLoaded', function() {
       currentX = 0;
       currentY = 0;
     });
-    
-    // Touch support for mobile
-    card.addEventListener('touchstart', function(e) {
-      if (e.target.tagName === 'A' || e.target.closest('a')) {
-        return;
-      }
-      
-      isDragging = true;
-      card.classList.add('dragging');
-      
-      const touch = e.touches[0];
-      startX = touch.clientX - currentX;
-      startY = touch.clientY - currentY;
-      
-      card.style.transition = 'none';
-      card.style.zIndex = '1000';
-    });
-    
-    document.addEventListener('touchmove', function(e) {
-      if (!isDragging) return;
-      
-      const touch = e.touches[0];
-      currentX = touch.clientX - startX;
-      currentY = touch.clientY - startY;
-      
-      card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${currentX * 0.02}deg)`;
-    });
-    
-    document.addEventListener('touchend', function() {
-      if (!isDragging) return;
-      
-      isDragging = false;
-      card.classList.remove('dragging');
-      
-      card.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-      card.style.transform = '';
-      card.style.zIndex = '';
-      
-      currentX = 0;
-      currentY = 0;
-    });
   });
+  }
   
   // ==========================================
-  // 3D CARD TILT EFFECT
+  // 3D CARD TILT EFFECT (Desktop Only)
   // ==========================================
   
-  cards.forEach(card => {
-    card.addEventListener('mousemove', function(e) {
-      if (card.classList.contains('dragging')) return;
+  if (!isTouchDevice && !isMobile) {
+    cards.forEach(card => {
+      card.addEventListener('mousemove', function(e) {
+        if (card.classList.contains('dragging')) return;
+        
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const rotateX = (y - centerY) / 10;
+        const rotateY = (centerX - x) / 10;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+      });
       
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      
-      const rotateX = (y - centerY) / 10;
-      const rotateY = (centerX - x) / 10;
-      
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+      card.addEventListener('mouseleave', function() {
+        if (!card.classList.contains('dragging')) {
+          card.style.transform = '';
+        }
+      });
     });
-    
-    card.addEventListener('mouseleave', function() {
-      if (!card.classList.contains('dragging')) {
-        card.style.transform = '';
-      }
-    });
-  });
+  }
   
   // ==========================================
   // PARALLAX SCROLLING
@@ -274,11 +241,13 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   
   // ==========================================
-  // HERO PARALLAX EFFECT
+  // HERO PARALLAX EFFECT (Desktop Only)
   // ==========================================
   
   const hero = document.querySelector('.hero');
-  if (hero) {
+  
+  // Only apply parallax on desktop for performance
+  if (hero && !isMobile) {
     window.addEventListener('scroll', function() {
       const scrolled = window.pageYOffset;
       const parallax = scrolled * 0.5;
@@ -287,10 +256,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   
   // ==========================================
-  // MOUSE MOVE PARALLAX ON HERO
+  // MOUSE MOVE PARALLAX ON HERO (Desktop Only)
   // ==========================================
   
-  if (hero) {
+  if (hero && !isTouchDevice && !isMobile) {
     hero.addEventListener('mousemove', function(e) {
       const mouseX = e.clientX / window.innerWidth;
       const mouseY = e.clientY / window.innerHeight;
@@ -322,6 +291,58 @@ document.addEventListener('DOMContentLoaded', function() {
       const nextSection = document.querySelector('#about');
       if (nextSection) {
         nextSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+  
+  // ==========================================
+  // MOBILE MENU TOGGLE
+  // ==========================================
+  
+  const mobileMenuToggle = document.querySelector('.mobile-menu-toggle');
+  const navLinksContainer = document.querySelector('.nav-links');
+  
+  if (mobileMenuToggle && navLinksContainer) {
+    // Toggle menu on button click
+    mobileMenuToggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      navLinksContainer.classList.toggle('active');
+      this.classList.toggle('active');
+      
+      // Prevent body scroll when menu is open
+      if (navLinksContainer.classList.contains('active')) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    });
+    
+    // Close mobile menu when clicking a link
+    navLinksContainer.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', function() {
+        navLinksContainer.classList.remove('active');
+        mobileMenuToggle.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    });
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!navLinksContainer.contains(e.target) && !mobileMenuToggle.contains(e.target)) {
+        if (navLinksContainer.classList.contains('active')) {
+          navLinksContainer.classList.remove('active');
+          mobileMenuToggle.classList.remove('active');
+          document.body.style.overflow = '';
+        }
+      }
+    });
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && navLinksContainer.classList.contains('active')) {
+        navLinksContainer.classList.remove('active');
+        mobileMenuToggle.classList.remove('active');
+        document.body.style.overflow = '';
       }
     });
   }
