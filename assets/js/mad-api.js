@@ -5,7 +5,7 @@
   
   // Configuration
   // AWS Lambda API Gateway URL - Update after deployment
-  const API_BASE_URL = 'YOUR_API_GATEWAY_URL_HERE';  // e.g., https://abc123.execute-api.us-east-1.amazonaws.com/Prod
+  const API_BASE_URL = 'https://j6xqi5kcbe.execute-api.us-east-1.amazonaws.com/Prod';  // e.g., https://abc123.execute-api.us-east-1.amazonaws.com/Prod
   
   const API_ENDPOINT = '/method'; // Default endpoint
   const FALLBACK_MESSAGE = 'Method has MADness';
