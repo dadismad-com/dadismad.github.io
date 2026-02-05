@@ -4,9 +4,17 @@
   'use strict';
   
   // Configuration
-  const API_BASE_URL = 'http://localhost:3000'; // Change to your deployed API URL
-  const API_ENDPOINT = '/method'; // Default endpoint
-  const FALLBACK_MESSAGE = 'Welcome to where Method has MADness';
+  // Auto-detect deployment platform or use custom URL
+  const API_BASE_URL = window.location.hostname.includes('netlify')
+    ? '/.netlify/functions/mad'  // Netlify Functions
+    : window.location.hostname.includes('vercel')
+    ? '/api/mad'  // Vercel Functions
+    : window.location.hostname.includes('localhost')
+    ? 'http://localhost:3000'  // Local development
+    : '/.netlify/functions/mad';  // Default to Netlify
+  
+  const API_ENDPOINT = '/method'; // Default endpoint (for Express version)
+  const FALLBACK_MESSAGE = 'Method has MADness';
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
   
   // Hero title element
@@ -28,8 +36,18 @@
         return cached;
       }
       
+      // Determine URL based on deployment
+      let fetchUrl;
+      if (API_BASE_URL.includes('functions') || API_BASE_URL.includes('/api/')) {
+        // Serverless function - use endpoint query param
+        fetchUrl = `${API_BASE_URL}?endpoint=method`;
+      } else {
+        // Express server - use path
+        fetchUrl = `${API_BASE_URL}${API_ENDPOINT}?format=json`;
+      }
+      
       // Fetch from API
-      const response = await fetch(`${API_BASE_URL}${API_ENDPOINT}?format=json`, {
+      const response = await fetch(fetchUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
