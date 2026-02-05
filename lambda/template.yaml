@@ -10,6 +10,11 @@ Globals:
     Environment:
       Variables:
         NODE_ENV: production
+  Api:
+    Cors:
+      AllowMethods: "'GET, OPTIONS'"
+      AllowHeaders: "'Content-Type'"
+      AllowOrigin: "'*'"
 
 Resources:
   MADFunction:
@@ -32,8 +37,13 @@ Resources:
           Properties:
             Path: /{proxy+}
             Method: get
-        # OPTIONS for CORS
-        OptionsAPI:
+        # OPTIONS for CORS preflight
+        RootOptionsAPI:
+          Type: Api
+          Properties:
+            Path: /
+            Method: options
+        ProxyOptionsAPI:
           Type: Api
           Properties:
             Path: /{proxy+}
@@ -41,21 +51,11 @@ Resources:
       Tags:
         Service: mad-as-a-service
         Environment: production
-
-  # API Gateway
-  MADApi:
-    Type: AWS::Serverless::Api
-    Properties:
-      StageName: prod
-      Cors:
-        AllowMethods: "'GET, OPTIONS'"
-        AllowHeaders: "'Content-Type'"
-        AllowOrigin: "'*'"
       
 Outputs:
-  MADApi:
+  MADApiUrl:
     Description: "API Gateway endpoint URL for MAD service"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod"
   
   MADFunction:
     Description: "MAD Lambda Function ARN"

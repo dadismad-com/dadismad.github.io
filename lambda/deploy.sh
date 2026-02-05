@@ -83,7 +83,7 @@ echo ""
 # Get API endpoint
 API_URL=$(aws cloudformation describe-stacks \
     --stack-name mad-as-a-service \
-    --query 'Stacks[0].Outputs[?OutputKey==`MADApi`].OutputValue' \
+    --query 'Stacks[0].Outputs[?OutputKey==`MADApiUrl`].OutputValue' \
     --output text \
     --region "$REGION")
 
