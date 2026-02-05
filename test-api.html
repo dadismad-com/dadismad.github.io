@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MAD API Test</title>
+  <style>
+    body {
+      font-family: monospace;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #1a1a2e;
+      color: #eaeaea;
+    }
+    h1 { color: #e94560; }
+    .test-box {
+      background: #16213e;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+      border: 1px solid #e94560;
+    }
+    button {
+      background: #e94560;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #ff5577;
+    }
+    pre {
+      background: #0f3460;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    #result { margin-top: 15px; }
+    .success { color: #00ff00; }
+    .error { color: #ff5577; }
+  </style>
+</head>
+<body>
+  <h1>🤪 MAD API Integration Test</h1>
+  
+  <div class="test-box">
+    <h2>1. Test API Endpoint</h2>
+    <button onclick="testAPI()">Test API Call</button>
+    <div id="api-result"></div>
+  </div>
+  
+  <div class="test-box">
+    <h2>2. Test Hero Element</h2>
+    <button onclick="testHeroElement()">Check Hero Element</button>
+    <div id="hero-result"></div>
+  </div>
+  
+  <div class="test-box">
+    <h2>3. Test Script Loading</h2>
+    <button onclick="testScripts()">Check Scripts</button>
+    <div id="script-result"></div>
+  </div>
+  
+  <div class="test-box">
+    <h2>4. Manual API Test</h2>
+    <button onclick="manualTest()">Fetch MAD Message</button>
+    <div id="manual-result"></div>
+  </div>
+  
+  <div class="test-box">
+    <h2>5. Check Console</h2>
+    <p>Open browser console (F12) and look for:</p>
+    <pre>🤪 MAD Message: [message here]</pre>
+    <p>If you see errors, copy them and share.</p>
+  </div>
+
+  <script>
+    const API_URL = 'https://j6xqi5kcbe.execute-api.us-east-1.amazonaws.com/Prod';
+    
+    async function testAPI() {
+      const result = document.getElementById('api-result');
+      result.innerHTML = '<p>Testing...</p>';
+      
+      try {
+        const response = await fetch(`${API_URL}/method`);
+        const data = await response.json();
+        
+        result.innerHTML = `
+          <p class="success">✅ API is working!</p>
+          <pre>${JSON.stringify(data, null, 2)}</pre>
+          <p>Status: ${response.status}</p>
+        `;
+      } catch (error) {
+        result.innerHTML = `
+          <p class="error">❌ API Error</p>
+          <pre>${error.message}</pre>
+        `;
+      }
+    }
+    
+    function testHeroElement() {
+      const result = document.getElementById('hero-result');
+      const hero = document.querySelector('.hero h1');
+      
+      if (hero) {
+        result.innerHTML = `
+          <p class="success">✅ Hero element found!</p>
+          <p>Current text: <strong>${hero.textContent}</strong></p>
+          <p>Selector: .hero h1</p>
+        `;
+      } else {
+        result.innerHTML = `
+          <p class="error">❌ Hero element NOT found</p>
+          <p>Selector '.hero h1' returned null</p>
+          <p>Check if you're on the homepage</p>
+        `;
+      }
+    }
+    
+    function testScripts() {
+      const result = document.getElementById('script-result');
+      const scripts = Array.from(document.scripts).map(s => s.src);
+      
+      const madAPI = scripts.find(s => s.includes('mad-api.js'));
+      const particles = scripts.find(s => s.includes('particles.js'));
+      const smoothScroll = scripts.find(s => s.includes('smooth-scroll.js'));
+      
+      result.innerHTML = `
+        <p>Scripts loaded:</p>
+        <pre>${scripts.filter(s => s).join('\n')}</pre>
+        <p>MAD API: ${madAPI ? '✅' : '❌'}</p>
+        <p>Particles: ${particles ? '✅' : '❌'}</p>
+        <p>Smooth Scroll: ${smoothScroll ? '✅' : '❌'}</p>
+      `;
+    }
+    
+    async function manualTest() {
+      const result = document.getElementById('manual-result');
+      result.innerHTML = '<p>Fetching...</p>';
+      
+      try {
+        const response = await fetch(`${API_URL}/method`);
+        const data = await response.json();
+        const message = data.mad;
+        
+        const fullMessage = `Welcome to where ${message}`;
+        
+        result.innerHTML = `
+          <p class="success">✅ Message fetched!</p>
+          <p><strong>API Response:</strong> ${message}</p>
+          <p><strong>Full Message:</strong> ${fullMessage}</p>
+        `;
+      } catch (error) {
+        result.innerHTML = `
+          <p class="error">❌ Error: ${error.message}</p>
+        `;
+      }
+    }
+    
+    // Auto-run tests on load
+    window.addEventListener('load', () => {
+      console.log('🧪 MAD API Test Page Loaded');
+      console.log('Run tests by clicking the buttons above');
+    });
+  </script>
+</body>
+</html>
