@@ -8,7 +8,7 @@
   const API_BASE_URL = 'https://j6xqi5kcbe.execute-api.us-east-1.amazonaws.com/Prod';  // e.g., https://abc123.execute-api.us-east-1.amazonaws.com/Prod
   
   const API_ENDPOINT = '/method'; // Default endpoint
-  const FALLBACK_MESSAGE = 'Method has MADness';
+  const FALLBACK_MESSAGE = 'Welcome to where Method has MADness';
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
   
   // Hero title element
@@ -105,18 +105,13 @@
    * Update hero title with animation
    */
   function updateHeroTitle(message) {
-    // Format the message with "Welcome to where" prefix
-    const fullMessage = message.includes('Welcome') 
-      ? message 
-      : `Welcome to where ${message}`;
-    
     // Fade out
     heroTitle.style.opacity = '0';
     heroTitle.style.transform = 'translateY(-10px)';
     
     setTimeout(() => {
-      // Update text
-      heroTitle.textContent = fullMessage;
+      // Update text directly from API
+      heroTitle.textContent = message;
       
       // Fade in
       heroTitle.style.transition = 'all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)';

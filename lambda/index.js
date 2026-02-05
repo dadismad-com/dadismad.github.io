@@ -14,20 +14,20 @@ const madResponses = {
   ],
   
   methods: [
-    "There's a method to this MADness.",
-    "Methodically MAD, Madly Methodical.",
-    "MAD by name, Method by nature.",
-    "Making All Decisions with Method to the MADness.",
-    "The MADness is the method.",
-    "MAD? Yes. Random? Never.",
-    "Where MADness meets methodology.",
-    "Controlled chaos by MAD design.",
-    "Sanely insane since forever.",
-    "Strategically unhinged.",
-    "Calculated MADness.",
-    "M.A.D.: Meticulous. Audacious. Deliberate.",
-    "They said I was MAD. Turned out there was a method to it.",
-    "Perfectly calculated chaos. Method to the MADness."
+    "Welcome to where there's a method to this MADness.",
+    "Welcome to where we're Methodically MAD, Madly Methodical.",
+    "Welcome to where MAD is by name, Method by nature.",
+    "Welcome to where we're Making All Decisions with Method to the MADness.",
+    "Welcome to where the MADness is the method.",
+    "Welcome to where we're MAD? Yes. Random? Never.",
+    "Welcome to where MADness meets methodology.",
+    "Welcome to where controlled chaos meets MAD design.",
+    "Welcome to where we've been sanely insane since forever.",
+    "Welcome to where we're strategically unhinged.",
+    "Welcome to where there's calculated MADness.",
+    "Welcome to where we're M.A.D.: Meticulous. Audacious. Deliberate.",
+    "Welcome to where they said I was MAD. Turned out there was a method to it.",
+    "Welcome to where there's perfectly calculated chaos. Method to the MADness."
   ],
   
   pure: [
