@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: MAD as a Service - Serverless API
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 256
+    Runtime: nodejs18.x
+    Environment:
+      Variables:
+        NODE_ENV: production
+
+Resources:
+  MADFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: mad-as-a-service
+      CodeUri: .
+      Handler: index.handler
+      Description: Enterprise-grade MADness API
+      Events:
+        # Root endpoint
+        RootAPI:
+          Type: Api
+          Properties:
+            Path: /
+            Method: get
+        # Catch-all for all paths
+        ProxyAPI:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: get
+        # OPTIONS for CORS
+        OptionsAPI:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: options
+      Tags:
+        Service: mad-as-a-service
+        Environment: production
+
+  # API Gateway
+  MADApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: prod
+      Cors:
+        AllowMethods: "'GET, OPTIONS'"
+        AllowHeaders: "'Content-Type'"
+        AllowOrigin: "'*'"
+      
+Outputs:
+  MADApi:
+    Description: "API Gateway endpoint URL for MAD service"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  
+  MADFunction:
+    Description: "MAD Lambda Function ARN"
+    Value: !GetAtt MADFunction.Arn
+  
+  MADFunctionIamRole:
+    Description: "Implicit IAM Role created for MAD function"
+    Value: !GetAtt MADFunctionRole.Arn

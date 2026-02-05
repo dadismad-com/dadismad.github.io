@@ -4,16 +4,10 @@
   'use strict';
   
   // Configuration
-  // Auto-detect deployment platform or use custom URL
-  const API_BASE_URL = window.location.hostname.includes('netlify')
-    ? '/.netlify/functions/mad'  // Netlify Functions
-    : window.location.hostname.includes('vercel')
-    ? '/api/mad'  // Vercel Functions
-    : window.location.hostname.includes('localhost')
-    ? 'http://localhost:3000'  // Local development
-    : '/.netlify/functions/mad';  // Default to Netlify
+  // AWS Lambda API Gateway URL - Update after deployment
+  const API_BASE_URL = 'YOUR_API_GATEWAY_URL_HERE';  // e.g., https://abc123.execute-api.us-east-1.amazonaws.com/Prod
   
-  const API_ENDPOINT = '/method'; // Default endpoint (for Express version)
+  const API_ENDPOINT = '/method'; // Default endpoint
   const FALLBACK_MESSAGE = 'Method has MADness';
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
   
@@ -36,15 +30,8 @@
         return cached;
       }
       
-      // Determine URL based on deployment
-      let fetchUrl;
-      if (API_BASE_URL.includes('functions') || API_BASE_URL.includes('/api/')) {
-        // Serverless function - use endpoint query param
-        fetchUrl = `${API_BASE_URL}?endpoint=method`;
-      } else {
-        // Express server - use path
-        fetchUrl = `${API_BASE_URL}${API_ENDPOINT}?format=json`;
-      }
+      // Build API URL
+      const fetchUrl = `${API_BASE_URL}${API_ENDPOINT}`;
       
       // Fetch from API
       const response = await fetch(fetchUrl, {

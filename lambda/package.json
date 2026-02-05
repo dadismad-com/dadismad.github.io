@@ -1,0 +1,19 @@
+{
+  "name": "mad-as-a-service-lambda",
+  "version": "1.0.0",
+  "description": "MAD as a Service - AWS Lambda Function",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "deploy": "./deploy.sh",
+    "local": "sam local start-api"
+  },
+  "keywords": [
+    "mad",
+    "lambda",
+    "serverless",
+    "aws"
+  ],
+  "author": "Miguel De Los Santos",
+  "license": "MIT"
+}

@@ -2,11 +2,11 @@
 
 ## 🤪 Overview
 
-Your DadisMAD portfolio now dynamically fetches different messages on each page load using the **mad-as-a-service** API!
+Your DadisMAD portfolio now dynamically fetches different messages on each page load using **AWS Lambda + API Gateway**!
 
 ## ✨ How It Works
 
-Every time someone visits your site, the hero section fetches a random message from your API:
+Every time someone visits your site, the hero section fetches a random message from your serverless API:
 
 - **Default**: "Method has MADness"
 - **On Load**: Fetches from `/method` endpoint
@@ -17,73 +17,84 @@ Every time someone visits your site, the hero section fetches a random message f
   - "Calculated MADness."
   - And more!
 
-## 🚀 Setup Instructions
+## 🚀 Deploy to AWS Lambda
 
-### 1. Deploy Your API
+Your API is in the `lambda/` folder and ready to deploy!
 
-Your API lives in `mad-as-a-service/` folder. You need to deploy it first:
+### Prerequisites
 
-#### Option A: Deploy to Render.com (Free)
+1. **AWS CLI** installed and configured
+   ```bash
+   # Install AWS CLI
+   # https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+   
+   # Configure with your credentials
+   aws configure
+   ```
+
+2. **SAM CLI** (optional - deploy script installs it automatically)
+   ```bash
+   pip install aws-sam-cli
+   ```
+
+### Quick Deploy
+
 ```bash
-cd mad-as-a-service
-
-# Create a Render account at https://render.com
-# Create a new Web Service
-# Connect your GitHub repo
-# Set build command: npm install
-# Set start command: npm start
-# Deploy!
+cd lambda
+./deploy.sh
 ```
 
-#### Option B: Deploy to Railway.app (Free)
-```bash
-cd mad-as-a-service
+The script will:
+- ✅ Check your AWS credentials
+- ✅ Create S3 bucket for deployment
+- ✅ Build the Lambda function
+- ✅ Deploy via CloudFormation
+- ✅ Output your API Gateway URL
 
-# Visit https://railway.app
-# Click "Start a New Project"
-# Select "Deploy from GitHub repo"
-# Select mad-as-a-service folder
-# Railway auto-detects Node.js and deploys
-```
+**That's it!** Your API will be live in ~2 minutes.
 
-#### Option C: Run Locally for Testing
-```bash
-cd mad-as-a-service
-npm install
-npm start
+### Update API URL in Your Website
 
-# API runs at http://localhost:3000
-```
-
-### 2. Update API URL
-
-Once deployed, update the API URL in `assets/js/mad-api.js`:
+After deployment, the script outputs your API Gateway URL. Update `assets/js/mad-api.js`:
 
 ```javascript
 // Change this line:
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'YOUR_API_GATEWAY_URL_HERE';
 
-// To your deployed URL:
-const API_BASE_URL = 'https://your-app-name.onrender.com';
+// To your actual URL (from deploy script output):
+const API_BASE_URL = 'https://abc123xyz.execute-api.us-east-1.amazonaws.com/Prod';
 ```
 
-### 3. Enable CORS (If Needed)
+Then commit and push:
+```bash
+git add assets/js/mad-api.js
+git commit -m "Update Lambda API URL"
+git push origin main
+```
 
-Your API already has CORS enabled, but make sure your deployed service allows requests from:
-- `https://dadismad.com`
-- `https://dadismad.github.io`
+## 📡 API Endpoints
+
+Your Lambda function provides:
+
+| Endpoint | Description |
+|----------|-------------|
+| `/method` | Methodical wisdom (14 variations) |
+| `/madness` | Pure MADness (7 variations) |
+| `/random` | Random from all categories |
+| `/mad` | Simple MAD affirmations |
+| `/mad/5` | Level-based MADness (1-10) |
+| `/mad/status` | Status check (418 response) |
 
 ## 🎛️ Configuration Options
 
 In `assets/js/mad-api.js`, you can customize:
 
 ```javascript
-const API_ENDPOINT = '/method';  // Change endpoint
-// Options: /mad, /method, /madness, /random
+const API_ENDPOINT = '/method';  // Default endpoint used by website
 
-const FALLBACK_MESSAGE = 'Method has MADness'; // Fallback if API fails
+const FALLBACK_MESSAGE = 'Method has MADness'; // Shown if API fails
 
-const CACHE_DURATION = 5 * 60 * 1000; // Cache duration (5 minutes)
+const CACHE_DURATION = 5 * 60 * 1000; // Cache for 5 minutes
 ```
 
 ## 🔄 Manual Refresh
@@ -100,20 +111,39 @@ Press `Cmd/Ctrl + Shift + M` to get a new message
 
 ## 🧪 Testing
 
-### Test API Endpoints:
+### Test Lambda Function Locally:
 
 ```bash
-# Simple MAD
-curl https://your-api-url.com/mad
+cd lambda
+
+# Run test script
+node test.js
+
+# Or use SAM local
+sam local start-api
+curl http://localhost:3000/method
+```
+
+### Test Deployed API:
+
+```bash
+# Replace with your API Gateway URL
+API_URL="https://abc123.execute-api.us-east-1.amazonaws.com/Prod"
 
 # Method (used by website)
-curl https://your-api-url.com/method
+curl $API_URL/method
 
-# JSON format
-curl https://your-api-url.com/method?format=json
+# Random MADness
+curl $API_URL/random
 
-# Random from all categories
-curl https://your-api-url.com/random
+# Pure madness
+curl $API_URL/madness
+
+# Level 5
+curl $API_URL/mad/5
+
+# With options
+curl "$API_URL/method?uppercase=true&philosophy=true"
 ```
 
 ### Test Website Integration:
@@ -127,7 +157,7 @@ curl https://your-api-url.com/random
 
 ### Add More Messages:
 
-Edit `mad-as-a-service/server.js`:
+Edit `lambda/index.js`:
 
 ```javascript
 methods: [
@@ -135,6 +165,12 @@ methods: [
   "Your new message here!",
   // Add more...
 ]
+```
+
+Then redeploy:
+```bash
+cd lambda
+./deploy.sh
 ```
 
 ### Change Animation:
@@ -150,36 +186,33 @@ function updateHeroTitle(message) {
 }
 ```
 
-## 📊 API Endpoints Available
-
-| Endpoint | Description | Example Response |
-|----------|-------------|------------------|
-| `/mad` | Simple MAD affirmation | "Absolutely MAD." |
-| `/method` | Methodical wisdom | "There's a method to this MADness." |
-| `/madness` | Pure MADness | "MAXIMUM MADness ACHIEVED." |
-| `/random` | Random from all | Varies |
-| `/mad/:level` | Scaled 1-10 | "Quite MAD" (level 5) |
-| `/method-to-madness` | Alias for /method | Same as /method |
-
 ### Query Parameters:
-- `format=json` - JSON response
-- `format=xml` - XML response
-- `format=html` - HTML page
 - `uppercase=true` - SHOUTY MODE
-- `philosophy=true` - Add bonus wisdom
+- `philosophy=true` - Add bonus MAD wisdom
+- `format=text` - Plain text (default: JSON)
 
 ## 🐛 Troubleshooting
 
 ### Message Not Changing?
 - Check browser console for errors
-- Verify API is running: visit API URL in browser
+- Verify API URL is updated in `mad-api.js`
+- Test API directly: `curl YOUR_API_URL/method`
 - Clear sessionStorage: `sessionStorage.clear()`
-- Check CORS headers if using different domain
 
 ### Shows Fallback Message?
-- API might be down - check deployment
-- Network timeout - check internet connection
-- Wrong API URL - verify in `mad-api.js`
+- Lambda might be cold starting (first request ~1-2s)
+- Wrong API URL in `mad-api.js`
+- Check CloudWatch Logs for errors
+
+### Lambda Deployment Failed?
+- Check AWS credentials: `aws sts get-caller-identity`
+- Verify IAM permissions (Lambda, API Gateway, S3, CloudFormation)
+- Check CloudFormation events in AWS Console
+
+### CORS Issues?
+- CORS is pre-configured in Lambda
+- Verify in browser console which header is missing
+- Check Lambda logs for actual response
 
 ### Cache Issues?
 Messages are cached for 5 minutes per session. To force refresh:
@@ -187,26 +220,36 @@ Messages are cached for 5 minutes per session. To force refresh:
 - Close and reopen browser tab
 - Reduce `CACHE_DURATION` in config
 
-## 🌐 Production Deployment
+## 💰 AWS Costs
 
-Before going live:
+**AWS Free Tier (Forever):**
+- 1 million Lambda requests/month
+- 400,000 GB-seconds compute time/month
 
-1. ✅ Deploy API to production service
-2. ✅ Update API_BASE_URL to production URL
-3. ✅ Test all endpoints
-4. ✅ Verify CORS headers
-5. ✅ Check error handling
-6. ✅ Monitor API response times
-7. ✅ Set up API monitoring (optional)
+**AWS Free Tier (12 months):**
+- 1 million API Gateway requests/month
 
-## 🎯 Recommended Services
+**After Free Tier:**
+- Lambda: ~$0.20 per 1M requests
+- API Gateway: ~$3.50 per 1M requests
 
-**Free API Hosting:**
-- [Render.com](https://render.com) - Easy, free tier
-- [Railway.app](https://railway.app) - Auto-deploys from Git
-- [Fly.io](https://fly.io) - Fast, global deployment
-- [Vercel](https://vercel.com) - Works with Node.js
-- [Netlify Functions](https://netlify.com) - Serverless option
+**For a personal portfolio:** You'll likely never pay anything! 🎉
+
+## 📊 Monitoring
+
+### View Logs
+```bash
+# Tail logs in real-time
+sam logs --stack-name mad-as-a-service --tail
+
+# Or use AWS CLI
+aws logs tail /aws/lambda/mad-as-a-service --follow
+```
+
+### AWS Console
+- Lambda: https://console.aws.amazon.com/lambda
+- API Gateway: https://console.aws.amazon.com/apigateway
+- CloudWatch: https://console.aws.amazon.com/cloudwatch
 
 ## 📝 Notes
 
